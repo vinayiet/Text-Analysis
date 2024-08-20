@@ -108,10 +108,6 @@ The results of the text analysis will be saved in an Excel file formatted accord
 - **.gitignore**: Specifies files and directories to be ignored by Git.
 - **requirements.txt**: Lists the Python dependencies.
 
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request to contribute to the project.
