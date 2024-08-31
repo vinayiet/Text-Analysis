@@ -14,7 +14,6 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 def load_input_data(file_path):
     df = pd.read_excel(file_path)
     return df
-  # Limit to 5 rows for testing
 
 # Function to extract article content
 def extract_article(url, url_id):
@@ -27,20 +26,9 @@ def extract_article(url, url_id):
             title_tag = soup.find('title')
             title = title_tag.get_text(strip=True) if title_tag else 'No Title Found'
 
-            # Extract article text from multiple tags (p, ul, li, div)
-            article_content = []
-
-            # Extract <p> tags
+            # Extract text from <p> tags
             paragraphs = soup.find_all('p')
-            article_content += [p.get_text(strip=True) for p in paragraphs]
-
-            # Extract <li> tags within <ul>
-            list_items = soup.find_all('li')
-            article_content += [li.get_text(strip=True) for li in list_items]
-
-            # Optionally extract from <div> tags, especially if they're structured for article text
-            divs = soup.find_all('div')
-            article_content += [div.get_text(strip=True) for div in divs if len(div.get_text(strip=True)) > 30]
+            article_content = [p.get_text(strip=True) for p in paragraphs]
 
             # Join all the text content into a single string
             article_text = ' '.join(article_content)

@@ -15,9 +15,8 @@ STOPWORDS_PATH = "../data/StopWords/"
 MASTER_DICT_PATH = "../data/MasterDictionary/"
 ARTICLES_PATH = "../data/output/extracted_articles/"
 OUTPUT_PATH = "../data/output/Output Data Structure.xlsx"
-INPUT_PATH = "../data/input.xlsx" # Path to import the URL for the DataFrame
+INPUT_PATH = "../data/input.xlsx"
 
-# Function to load custom stopwords from files
 def load_stopwords():
     stopwords_files = ['StopWords_Auditor.txt', 'StopWords_Currencies.txt', 'StopWords_DatesandNumbers.txt', 'StopWords_Generic.txt', 'StopWords_Geographic.txt', 'StopWords_Names.txt']
     stopwords_set = set()
@@ -32,13 +31,11 @@ def load_stopwords():
     
     return stopwords_set
 
-# Function to load URLs from the input Excel file
 def load_urls(url_id):
     input_df = pd.read_excel(INPUT_PATH)
     url = input_df.loc[input_df['URL_ID'] == url_id, 'URL'].values[0]
     return url
 
-# Function to load positive and negative word dictionaries
 def load_master_dictionary():
     positive_words = set()
     negative_words = set()
@@ -51,23 +48,16 @@ def load_master_dictionary():
     
     return positive_words, negative_words
 
-# Function to clean and tokenize the text
 def clean_and_tokenize(text, stopwords_set):
-    # Lowercase the text and remove stopwords
     words = word_tokenize(text.lower())
     cleaned_words = [word for word in words if word.isalpha() and word not in stopwords_set]
-    
-    # Sentence tokenization
     sentences = sent_tokenize(text)
-    
     return cleaned_words, sentences
 
-# Function to compute sentiment scores
 def compute_sentiment_scores(cleaned_words, positive_words, negative_words):
     positive_score = sum(1 for word in cleaned_words if word in positive_words)
     negative_score = sum(1 for word in cleaned_words if word in negative_words)
     
-    # Avoid division by zero
     total_score = positive_score + negative_score
     if total_score == 0:
         polarity_score = 0.0
@@ -78,13 +68,11 @@ def compute_sentiment_scores(cleaned_words, positive_words, negative_words):
     
     return positive_score, negative_score, polarity_score, subjectivity_score
 
-# Function to compute readability metrics
 def compute_readability_metrics(text):
     avg_sentence_length = textstat.sentence_count(text)
     fog_index = textstat.gunning_fog(text)
     return avg_sentence_length, fog_index
 
-# Function to count syllables in a word
 def count_syllables(word):
     vowels = "aeiou"
     count = sum(1 for char in word if char in vowels)
@@ -92,22 +80,18 @@ def count_syllables(word):
         count -= 1
     return count
 
-# Function to count complex words
 def count_complex_words(words):
     complex_words_count = sum(1 for word in words if count_syllables(word) > 2)
     return complex_words_count
 
-# Function to count personal pronouns
 def count_personal_pronouns(text):
     pronouns = re.findall(r'\b(I|we|my|ours|us)\b', text, re.I)
     return len(pronouns)
 
-# Function to calculate average word length
 def avg_word_length(cleaned_words):
     total_characters = sum(len(word) for word in cleaned_words)
     return total_characters / len(cleaned_words) if cleaned_words else 0
 
-# Function to analyze each article
 def analyze_article(url_id, text, positive_words, negative_words, stopwords_set):
     cleaned_words, sentences = clean_and_tokenize(text, stopwords_set)
     url = load_urls(url_id)
@@ -135,7 +119,6 @@ def analyze_article(url_id, text, positive_words, negative_words, stopwords_set)
         "AVERAGE_WORD_LENGTH": round(avg_word_len, 2)
     }
 
-# Main function to iterate over all articles and save results
 def main():
     stopwords_set = load_stopwords()
     positive_words, negative_words = load_master_dictionary()
@@ -146,8 +129,6 @@ def main():
         url_id = txt_file.split(".")[0]
         with open(os.path.join(ARTICLES_PATH, txt_file), "r", encoding="utf-8") as file:
             text = file.read()
-            
-            # Analyze the article
             analysis_results = analyze_article(url_id, text, positive_words, negative_words, stopwords_set)
             output.append(analysis_results)
     
@@ -156,6 +137,5 @@ def main():
     
     print(f"Analysis complete! Results saved to {OUTPUT_PATH}")
 
-# Run the main function
 if __name__ == "__main__":
     main()
